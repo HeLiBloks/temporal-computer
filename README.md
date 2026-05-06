@@ -1,3 +1,5 @@
+![Temporal Computer logo](assets/logo.png)
+
 # Temporal Computer
 
 A speculative Python simulator for a computer where **time is treated as a schedulable resource**.
