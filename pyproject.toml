@@ -5,6 +5,9 @@ description = "Toy simulator for temporal outcome registers and causality-aware 
 requires-python = ">=3.11"
 dependencies = []
 
+[project.scripts]
+temporal = "temporal_computer.cli:main"
+
 [project.optional-dependencies]
 dev = ["pytest>=8.0"]
 
