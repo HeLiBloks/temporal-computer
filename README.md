@@ -43,6 +43,69 @@ flowchart TD
 python -m temporal_computer.demo
 ```
 
+## CLI Prototype
+
+Install the package locally, then use either the `temporal` console script or `python -m temporal_computer.cli`.
+
+```bash
+python -m pip install -e '.[dev]'
+temporal demo
+```
+
+Create a job descriptor:
+
+```json
+{
+  "job_name": "compile",
+  "input_state": {
+    "code": "int main() { return 0; }"
+  },
+  "target_time": "T+5m",
+  "environment": {
+    "compiler": "toy-cc-1.0"
+  }
+}
+```
+
+Compute its temporal hash:
+
+```bash
+temporal hash job.json
+```
+
+Register a future outcome:
+
+```json
+{
+  "job": {
+    "job_name": "compile",
+    "input_state": {
+      "code": "int main() { return 0; }"
+    },
+    "target_time": "T+5m",
+    "environment": {
+      "compiler": "toy-cc-1.0"
+    }
+  },
+  "result": {
+    "status": "ok",
+    "artifact": "game-build-42"
+  },
+  "stable": false,
+  "provenance": "future packet"
+}
+```
+
+Then consume it and inspect temporal debt:
+
+```bash
+temporal register-put outcome.json
+temporal schedule job.json
+temporal debts-list
+```
+
+CLI state is stored under `.temporal/` as JSONL files.
+
 ## Tests
 
 ```bash
@@ -54,8 +117,10 @@ python -m pytest
 
 ```text
 temporal_computer/
+  cli.py                command-line prototype
   hashing.py            deterministic temporal hash
   outcome_register.py   content-addressed future outcomes
+  persistence.py        JSONL persistent store
   scheduler.py          scheduler + debt validation
   demo.py               minimal working example
 
