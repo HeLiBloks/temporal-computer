@@ -1,0 +1,6 @@
+Temporal Computer
+Copyright 2026 Henrik Lindgren
+
+This project is a speculative software simulator for temporal outcome registers,
+causality-aware scheduling, temporal hashing, and future-result validation.
+It does not implement real time travel.

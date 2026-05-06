@@ -1,57 +1,96 @@
 # Temporal Computer
 
-A speculative simulator for a computer with a fourth dimension of resources: time.
+A speculative Python simulator for a computer where **time is treated as a schedulable resource**.
 
-The core idea is a **Temporal Outcome Register**:
+The project explores a fictional-but-useful architecture built around:
+
+- temporal hashes
+- a Temporal Outcome Register
+- future outcome lookup
+- causality debt
+- conflict detection
+- rollback-oriented thinking
+
+It does **not** implement real time travel. It is a systems-design playground for ideas related to deterministic build systems, speculative execution, CI acceleration, reproducible computation, and future-result validation.
+
+## Core Idea
 
 ```text
 hash(job + input state + scheduled future time + environment)
   -> known future outcome
 ```
 
-The scheduler can use a previously registered future outcome immediately, but records temporal debt that must later be repaid by executing the same job and verifying that the resulting hash matches.
+If a future outcome is already known, the scheduler may return it immediately, but it records a **temporal debt**. That debt must later be repaid by executing the same job and verifying that the result matches.
 
-This is not real time travel. It is a software model for thinking about:
+```mermaid
+flowchart TD
+    Job[Job Descriptor] --> Hash[Temporal Hash]
+    Hash --> TOR[Temporal Outcome Register]
+    TOR -->|Hit| Outcome[Return Future Outcome Now]
+    TOR -->|Miss| Execute[Execute Locally]
+    Outcome --> Debt[Record Temporal Debt]
+    Execute --> Store[Store Stable Outcome]
+    Debt --> Verify[Verify Later]
+    Verify -->|Match| Repaid[Debt Repaid]
+    Verify -->|Mismatch| Conflict[Causality Conflict]
+```
 
-- content-addressed future results
-- temporal debt
-- causality validation
-- rollback barriers
-- deterministic scheduling
-
-## Run
+## Quickstart
 
 ```bash
 python -m temporal_computer.demo
 ```
 
-## Test
+## Tests
 
 ```bash
+python -m pip install -e '.[dev]'
 python -m pytest
 ```
 
-## Concepts
+## Repository Structure
 
-### Temporal hash
+```text
+temporal_computer/
+  hashing.py            deterministic temporal hash
+  outcome_register.py   content-addressed future outcomes
+  scheduler.py          scheduler + debt validation
+  demo.py               minimal working example
 
-A stable hash over:
+docs/
+  ARCHITECTURE.md       detailed architecture
+  CONCEPTS.md           design concepts from the discussion
+  MERMAID.md            diagram collection
+  ROADMAP.md            next technical steps
 
-- job name
-- input payload
-- target time
-- environment version
+codex/
+  NEXT_MOVE_PROMPT.md   prompt for Codex to continue the repo
+  FOLLOWUP_PROMPTS.md   future Codex tasks
+```
 
-### Future Outcome Register
+## Why This Is Interesting
 
-Stores outcomes received from a hypothetical future execution.
+The fictional time-machine framing maps surprisingly well onto real engineering problems:
 
-### Temporal Scheduler
+| Time-computer concept | Real-world analogy |
+|---|---|
+| Future outcome | cached or predicted result |
+| Temporal hash | content-addressed build key |
+| Temporal debt | deferred verification obligation |
+| Paradox | cache invalidation or nondeterminism |
+| Rollback barrier | transaction boundary |
+| Temporal scheduler | predictive CI/build scheduler |
 
-When scheduling a job, it:
+## Documentation
 
-1. Computes a temporal hash.
-2. Looks up a matching outcome.
-3. If found, returns the result immediately and records temporal debt.
-4. If not found, runs normally.
-5. Later, the debt can be verified by re-running the job and comparing hashes.
+Start here:
+
+- [Architecture](docs/ARCHITECTURE.md)
+- [Concepts](docs/CONCEPTS.md)
+- [Mermaid diagrams](docs/MERMAID.md)
+- [Roadmap](docs/ROADMAP.md)
+- [Codex next move](codex/NEXT_MOVE_PROMPT.md)
+
+## License
+
+Apache-2.0. See [LICENSE](LICENSE).
